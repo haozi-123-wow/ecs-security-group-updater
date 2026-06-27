@@ -61,14 +61,17 @@ client = AcsClient(
     region_id  # 此处填写你要管理的区域
 )
 
-#通过ip.cn网站获取外网ip地址
+#获取外网ip地址（国内可用服务）
 def get_now_ip():
-    url="https://api.ipify.org"
-    headers = { 'User-Agent': "curl/10.0","Content-type":"application/x-www-form-urlencoded","Accept":"text/plain"}
-    response = requests.get(url,headers=headers)
-    now_ip = response.content.decode("utf-8").strip()
+    import re
+    url = "https://myip.ipip.net"
+    headers = {"User-Agent": "curl/10.0"}
+    response = requests.get(url, headers=headers)
+    text = response.content.decode("utf-8")
+    match = re.search(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", text)
+    now_ip = match.group(1) if match else ""
     print("current ip address:%s" % (now_ip))
-    return (now_ip)
+    return now_ip
 
 #根据ip和port移除规则
 def remove_ip(securityGroupId, sourceCidrIp, portRange):
