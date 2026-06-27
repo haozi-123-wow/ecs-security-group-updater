@@ -63,10 +63,10 @@ client = AcsClient(
 
 #通过ip.cn网站获取外网ip地址
 def get_now_ip():
-    url="https://ifconfig.me"
+    url="https://api.ipify.org"
     headers = { 'User-Agent': "curl/10.0","Content-type":"application/x-www-form-urlencoded","Accept":"text/plain"}
     response = requests.get(url,headers=headers)
-    now_ip = response.content.decode("utf-8")
+    now_ip = response.content.decode("utf-8").strip()
     print("current ip address:%s" % (now_ip))
     return (now_ip)
 
