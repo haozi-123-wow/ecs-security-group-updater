@@ -61,17 +61,32 @@ client = AcsClient(
     region_id  # 此处填写你要管理的区域
 )
 
-#获取外网ip地址（国内可用服务）
+#获取外网ip地址（多服务兜底）
 def get_now_ip():
     import re
-    url = "https://myip.ipip.net"
     headers = {"User-Agent": "curl/10.0"}
-    response = requests.get(url, headers=headers)
-    text = response.content.decode("utf-8")
-    match = re.search(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", text)
-    now_ip = match.group(1) if match else ""
-    print("current ip address:%s" % (now_ip))
-    return now_ip
+    services = [
+         ("https://api-ipv4.ip.sb/ip", "text"),
+         ("https://ipv4.ifconfig.me", "text")
+     ]
+    for url, mode in services:
+        try:
+            response = requests.get(url, headers=headers, timeout=5)
+            text = response.text.strip()
+            if mode == "text":
+                now_ip = text
+            elif mode == "regex":
+                match = re.search(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", text)
+                now_ip = match.group(1) if match else ""
+            elif mode == "json":
+                import json
+                now_ip = json.loads(text).get("origin", "").split(",")[0].strip()
+            if now_ip:
+                print("current ip address:%s (via %s)" % (now_ip, url))
+                return now_ip
+        except Exception as e:
+            print("  %s failed: %s" % (url, e))
+    return ""
 
 #根据ip和port移除规则
 def remove_ip(securityGroupId, sourceCidrIp, portRange):
