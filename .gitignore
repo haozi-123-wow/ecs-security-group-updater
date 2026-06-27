@@ -1,0 +1,4 @@
+config.sh
+config.json
+/venv
+__pycache__/config.cpython-313.pyc
